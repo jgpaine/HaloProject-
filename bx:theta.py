@@ -3,26 +3,29 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-# june 6 2023, Make the plot in the book
+# june 14 2023, Make the plot in the book
 
 
-mass = 10*10**25  # solar mass
+mass = 10*10  # solar mass
 # Distances in kpc around 10 kps 1 kiloparsec = 3.086 * 10**16
-Dl = 1 * 3.086 * 10**16
-Dsl = 1 * 3.086 * 10**16
+Dl = 1  # kps
+Dsl = 1 # kps
 Ds = Dl + Dsl
 v = 100 # km/s
 c2= 9*10**10 #km/s^2 
-# Gravitational constant in km^2 Mpc M_sun^-1 s^-2
-G = 4.301 * 10**-9
-# add converstion
-
+# Gravitational constant in km^2 kpc M_sun^-1 s^-2
+G = 4.301 * 10**-6 
 # B values in km
-bx = [-9,-8,-7,-6,-5,-4,-3,-2,-1,-0.5,-0.25,-0.05,0.000001,0.05,0.25,0.5,1, 2, 3, 4, 5, 6, 7, 8, 9]
-# define this in mass loop
+num_points = 100
+num_points_per_side = num_points // 2
+log_points = np.logspace(-4, 0, num=num_points_per_side)
+bx = np.concatenate((-log_points[::-1], log_points))
+# B values in pc
+# bx = [-9,-8,-7,-6,-5,-4,-3,-2,-1,-0.5,-0.25,-0.05,0.000001,0.05,0.25,0.5,1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 def thetaE(Mass, Grav, Dstol, Dtos, Dtol): # eq.2.70
  
-    thetaE = math.sqrt((4 * Grav * Mass * Dstol) / (c2 * Dtos * Dtol * Dstol)) # add c^2
+    thetaE = math.sqrt((4 * Grav * Mass * Dstol) / (c2 * Dtos * Dtol )) # add c^2
     return thetaE
 
 def total_magnification(Beta, thetaE): # eq 4.16
@@ -47,11 +50,16 @@ def compute_mu(bx,by, theta):
 for i, x in enumerate(bx):
     # Create an empty list to store u values for the current B
     # Calculate thetaE for the current mass
-   # thetaE_val = thetaE(mass, G, Dsl, Ds, Dl)
-    thetaE_val = 1
+    thetaE_val = thetaE(mass, G, Dsl, Ds, Dl)
+    # convert to  arc seconds
+    #thetaE_as = thetaE_val * 2.062*10**5
+   # thetaE_val = 1 
+    #  1 r =  2.062 648 ×10^5 Arcsecond
+    print ( thetaE_val )
+    #thetaE_as  = 1
     mu_array = []
     bxt = []
-    by= 0.2 *  thetaE_val
+    by= 0.1 *  thetaE_val
     
     mu, u = compute_mu(bx[i], by, thetaE_val )
     mu_array.append(mu)
@@ -69,6 +77,6 @@ for i, x in enumerate(bx):
 
 plt.xlabel('Bx/ThetaE')
 plt.ylabel('Star Image Magnification factor (u)')
-plt.title('Magnification  vs. Impact Parameter x component,  by= 0.2 *  thetaE_val')
+plt.title('Magnification  vs. Impact Parameter x component,  by= 0.1 *  thetaE_val')
 plt.show()
 sys.exit()
