@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 
 
 #mass = 1  # solar mass
-Dl = 25  # kps
-Dsl = 5 # kps
+Dl = 0.1  # kps
+Dsl =700.0 # kps
 Ds = Dl + Dsl
 v = 100 # km/s
 c2= 9*10**10 #km/s^2 
 # Gravitational constant in km^2 kpc M_sun^-1 s^-2
-G = 4.302 * 10**-6 
+G = 4.302 * 10**-6
+close = 0.1
 
 num_points = 100
 num_points_per_side = num_points // 2
@@ -40,6 +41,7 @@ def duration(Mass,DL,DSL,DS,v):
 
 def compute_mu(bx,by, theta):
     u = (math.sqrt(bx**2 + by**2)) / theta
+  #  print(math.sqrt(bx**2 + by**2))
     numerator = u**2 + 2
     denominator = u * math.sqrt(u**2 + 4)
     mu = numerator / denominator
@@ -48,7 +50,7 @@ def compute_mu(bx,by, theta):
 # make mass array
 massarray  = np.logspace(np.log10(1e-6), np.log10(1e9), num=100)
 magmax = np.empty(len(massarray))
-print(massarray)
+#print(massarray)
 
 for j, m in enumerate(massarray):
     # Plotting loop over B values
@@ -61,7 +63,7 @@ for j, m in enumerate(massarray):
      #  1 r =  206264 Arcsecond
      mu_array = []
      bxt = []
-     by= 0.1 *  thetaE_as
+     by= close *  thetaE_as
     
      mu, u = compute_mu(bx[i], by, thetaE_as )
      mu_array.append(mu)
@@ -76,10 +78,14 @@ for j, m in enumerate(massarray):
      # plt.plot (bxt,  mu_array , 'o')
     magmax[j] = np.max(mu_array)
     magmax = np.array(magmax)
-    print( magmax[j])
+    #print( magmax[j])
     #plt.plot(massarray[j], magmax[j], 'o')
-    plt.semilogx(massarray[j], magmax[j], '.')
- 
+    plt.semilogx(massarray[j], magmax[j], '.', color='blue')
+
+#create output file
+with open('DL=' + str(Dl) + 'Ds='+ str(Ds)+'v='+ str(v) + 'TE-' + str(close) +  '.txt' , 'w') as file:
+    for j in range(len(massarray)):
+        file.write(f"{massarray[j]}, {magmax[j]}\n")
    
 
 
@@ -87,11 +93,11 @@ plt.xlabel('Point Mass in Solar Masses')
 plt.ylabel('Maxium Star Image Magnification factor (u)')
 plt.title('Mass vs Maxium Magnification')
 
-text_message = 'Minium impact parameter = 0.1 * Eistein Radius\n'
+text_message = 'Minium impact parameter = ' + str(close) + ' * Eistein Radius\n'
 text_message += 'Distance to lens =' + str(Dl) + ' kpc\n'
-text_message += 'Distance to sorce =' + str(Ds) + ' kpc'
+text_message += 'Distance to source =' + str(Ds) + ' kpc'
 
-plt.text(1e-6, 8, text_message, fontsize=8, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
+plt.text(1e-6, 2, text_message, fontsize=8, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
 
 plt.show()
 sys.exit()
